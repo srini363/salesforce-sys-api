@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule
+	xmlns:json-logger="http://www.mulesoft.org/schema/mule/json-logger"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/json-logger http://www.mulesoft.org/schema/mule/json-logger/current/mule-json-logger.xsd">
+	
+	<flow doc:id="e8195e11-9fda-40f7-b1dd-d5a640e390e2"
+		name="get-EmployeeDetail">
+		<json-logger:logger doc:name="Logging the request" doc:id="72da86ac-cdb4-4569-8ccb-12023549eef4" config-ref="JSON_Logger_Config" message='"Logging the request payload for get call "'/>
+		<set-variable value="#[attributes.uriParams.'employeeId']" doc:name="Set Variable to EmployeeId" doc:id="c2c3773b-e996-4718-bf3b-a02df5e2c9c9" variableName="employeeId"/>
+		<salesforce:query doc:name="Query the daEmployee details from the saleforce"
+			doc:id="0f4a276c-8cfe-4f98-909b-f60b10dfe96b"
+			config-ref="Salesforce_Config">
+			<salesforce:salesforce-query><![CDATA[select FirstName__c,LastName__c,DOB__c,Gender__c,Title__c,type__c,number__c,street__c,Unit__c,City__c,State__c,zipcode__c from Employee__c where employee_Id__c=':employeeId' LIMIT 20]]></salesforce:salesforce-query>
+			<salesforce:parameters><![CDATA[#[output application/java
+---
+{
+	"employeeId" : vars.employeeId
+}]]]></salesforce:parameters>
+		</salesforce:query>
+		<ee:transform doc:name="Transform the data" doc:id="c0279be3-fbb8-4906-9970-c282113705b4">
+			<ee:message>
+				<ee:set-payload resource="dwl/convertemploydetails.dwl" />
+			</ee:message>
+		</ee:transform>
+		<json-logger:logger doc:name="Logging the response " doc:id="2591eba4-30a5-437d-9b9b-589280c4dcbb" config-ref="JSON_Logger_Config" tracePoint="END" message='"Log the response"' >
+			<json-logger:content ><![CDATA[#[output application/json ---
+{
+ 	payload: payload
+}]]]></json-logger:content>
+		</json-logger:logger>
+	</flow>
+	<flow doc:id="ea765a2a-7403-4e02-8e5d-546e054f6e57"
+		name="update-EmployeeDetail">
+		<json-logger:logger doc:name="Logging the request" doc:id="1d3ffca3-1636-4200-b998-d6dc8e776b04" config-ref="JSON_Logger_Config" message='"Logging the request payload for  update call"'/>
+		<ee:transform
+			xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+			xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" doc:name="Transform Message to SF update">
+			<ee:message>
+				<ee:set-payload resource="dwl/update-employee-detail.dwl" />
+			
+</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="employeeId" ><![CDATA[%dw 2.0
+output application/java
+---
+payload.employeeId]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<ee:transform doc:name="convert to sf java object" doc:id="a6b6b8f3-70a6-41bc-8caf-aa39b3b5ffd5">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/java
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<salesforce:upsert objectType="Employee__c" doc:name="Upsert the date into salesforce" doc:id="d8f71792-2b5a-4657-8bb8-45c2f554e5e6" config-ref="Salesforce_Config" externalIdFieldName="employee_Id__c" />
+		<choice doc:name="Choice" doc:id="2dada4f1-033b-4904-b08e-14a6802baf04" >
+			<when expression='#[payload.successful == true]'>
+				<ee:transform doc:name="Transform Message" doc:id="a4a4a077-aa6a-40f6-a2f6-3be6260e8386">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"message":"Successfully updated the Employee Details "
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+				<json-logger:logger doc:name="Logging the response " doc:id="1abc5153-05f0-4d02-a019-72866cf3eb05" config-ref="JSON_Logger_Config" tracePoint="END" message='"Log the response"'>
+					<json-logger:content><![CDATA[#[output application/json ---
+{
+ 	payload: payload
+}]]]></json-logger:content>
+				</json-logger:logger>
+			</when>
+			<otherwise >
+				<set-payload value='#["Invalid employee ID  or Invalid data to update in SF"]' doc:name="Invalid Employee ID " doc:id="ea4e496c-c738-4980-95b5-040da05e8a93" />
+				<logger level="INFO" doc:name="Logging the info" doc:id="2f877a3e-c108-4649-8fb4-f29ab5d226e5" message="#[payload]"/>
+			</otherwise>
+		</choice>
+	</flow>
+	<flow doc:id="4232d2f5-024e-4917-a64f-39e06ced5aa8"
+		name="delete-EmployeeDetail">
+			<json-logger:logger doc:name="Logging the request id " doc:id="28a462fb-980c-4394-b2a9-d9d9ae98b865" config-ref="JSON_Logger_Config" message='"Logging the request payload "'/>
+		<set-variable value="#[attributes.uriParams.'employeeId']" doc:name="Set Variable to EmployeeId" doc:id="088bbe1e-a711-43fc-b3a7-9742b3b7f305" variableName="employeeId"/>
+		<salesforce:query doc:name="Query the ID  to delete employeeDetais in SF" doc:id="f0582bd0-1ff2-4c61-8d3f-f5da8990ed07" config-ref="Salesforce_Config">
+			<salesforce:salesforce-query><![CDATA[select FirstName__c,Id from Employee__c where employee_Id__c=':employeeId' LIMIT 20]]></salesforce:salesforce-query>
+			<salesforce:parameters><![CDATA[#[output application/java
+---
+{
+	"employeeId" : vars.employeeId
+}]]]></salesforce:parameters>
+		</salesforce:query>
+		<ee:transform doc:name="get the ID from payload" doc:id="8c201207-0a03-476c-b5e3-6106066a2dc7">
+			<ee:message>
+				<ee:set-payload resource="dwl/get-id.dwl" />
+			
+</ee:message>
+		</ee:transform>
+		<choice doc:name="Choice" doc:id="fc7e851a-3734-4da0-9ba1-59852cc6a732" >
+			<when expression='#[payload != null or payload != ""]'>
+				<salesforce:delete doc:name="Delete  employeeDetais in SF" doc:id="fb82ba89-a594-4ebb-9aca-348ad3c63dac" config-ref="Salesforce_Config" />
+				<ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+if (payload.successful == true) {
+	"message":"Successfully deleted the Employee Details "
+} else "Employee details is not deleted check the Employee Id posted"]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+				<json-logger:logger doc:name="Logging the response " doc:id="131bc2dd-923e-4428-9955-03bc4c095b92" config-ref="JSON_Logger_Config" tracePoint="END" message='"Log the response"' >
+					<json-logger:content ><![CDATA[#[output application/json ---
+{
+ 	payload: payload
+}]]]></json-logger:content>
+				</json-logger:logger>
+			</when>
+			<otherwise >
+				<set-payload value='#["Invalid Employee ID to delete the data"]' doc:name="Invalid Employee ID " doc:id="30acc0ac-42a0-477f-8f32-bf8b7a898df0" />
+				<logger level="INFO" doc:name="Logging the info" doc:id="b7f67968-ce69-439d-b108-26e4e2081a02" message="#[payload]"/>
+		</otherwise>
+		</choice>
+	
+
+	
+</flow>
+	<flow doc:id="d23cb08a-2410-4356-ac18-9267fa9b9e1f"
+		name="create-EmployeeDetail">
+		<json-logger:logger doc:name="Logging the request"
+			doc:id="866717c7-002a-451f-b12d-984bed19a965"
+			config-ref="JSON_Logger_Config"
+			message='"Logging the request payload "' />
+		<ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" doc:name="Transform the data to SF create">
+			<ee:message>
+				<ee:set-payload resource="dwl/create-employee-detail.dwl" />
+			
+</ee:message>
+		</ee:transform>
+		<ee:transform doc:name="covert to java object" doc:id="a2bfeeae-f68c-4f4a-88fb-f90a739a573a" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logging the transformed data"
+			doc:id="2de8a35b-e70e-41e5-9cf6-0efd299473f6"
+			message='#["Logging the transformed data"]' />
+		<salesforce:create doc:name="Create the data in SF"
+			doc:id="22a2de9d-b763-4f5f-ac4d-d8b1c78f04a2"
+			config-ref="Salesforce_Config" type="Employee__c" />
+		<ee:transform doc:name="Transform Message" doc:id="261ffd0d-9bc7-46e5-aa7f-623ec79583a3">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+if (payload.successful == true) {
+	"message":"Successfully Created the Employee Details "
+} else "Employee details is not Created"]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<json-logger:logger doc:name="Logging the response " doc:id="817b05cc-17f4-4846-a7e6-c9a5b8dc09d3" config-ref="JSON_Logger_Config" tracePoint="END" message='"Log the response"'/>
+	
+</flow>
+	
+	
+</mule>

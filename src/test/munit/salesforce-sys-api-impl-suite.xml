@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:munit="http://www.mulesoft.org/schema/mule/munit" xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+	<munit:config name="salesforce-sys-api-impl-suite.xml" />
+	<munit:test name="update-EmployeeDetail-test" doc:id="0cc66d9a-dc86-433b-b73b-87a54a15b98f" >
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock Upsert the date into salesforce" doc:id="71dee4a5-6a0a-4e51-a5f2-9fcf5af82927" processor="salesforce:upsert">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="d8f71792-2b5a-4657-8bb8-45c2f554e5e6" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[output application/java --- readUrl('classpath://updateEmployeeDetailtest\mock_payload.dwl')]" mediaType="application/java" encoding="UTF-8" />
+					<munit-tools:variables >
+						<munit-tools:variable key="outboundHeaders" value="#[readUrl('classpath://updateEmployeeDetailtest\mock_variable_.dwl')]" />
+						<munit-tools:variable key="employeeId" value="#[output application/java --- readUrl('classpath://updateEmployeeDetailtest\mock_variable_1.dwl')]" mediaType="application/java" encoding="UTF-8" />
+					</munit-tools:variables>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit:set-event doc:name="Set Input" doc:id="4404b7d2-a0bf-4895-b101-15045f326a08" >
+				<munit:payload value="#[output application/json --- readUrl('classpath://updateEmployeeDetailtest\set-event_payload.dwl')]" encoding="UTF-8" mediaType="application/json" />
+				<munit:attributes value="#[readUrl('classpath://updateEmployeeDetailtest\set-event_attributes.dwl')]" />
+				<munit:variables >
+					<munit:variable key="outboundHeaders" value="#[readUrl('classpath://updateEmployeeDetailtest\set-event_variable_.dwl')]" />
+				</munit:variables>
+			</munit:set-event>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to update-EmployeeDetail" doc:id="6843adb7-7f04-4be4-a1f9-ee7d2fdfd145" name="post:\updateEmployee:application\json:salesforce-sys-api-config"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert doc:name="Assert payload" doc:id="884ac187-eaa2-4423-b89e-9306324578ce" message="The payload does not match">
+				<munit-tools:that ><![CDATA[#[%dw 2.0
+import updateEmployeeDetailtest::assert_expression_payload
+---
+assert_expression_payload::main({payload: payload, attributes: attributes, vars: vars})]]]></munit-tools:that>
+			</munit-tools:assert>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="create-EmployeeDetail-test" doc:id="818c3c76-74cf-4bda-910c-f4f194fac26c" >
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock Create the data in SF" doc:id="59da97bf-0263-413b-9297-80b43b434724" processor="salesforce:create">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="22a2de9d-b763-4f5f-ac4d-d8b1c78f04a2" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[output application/java --- readUrl('classpath://createEmployeeDetailtest\mock_payload.dwl')]" mediaType="application/java" encoding="UTF-8" />
+					<munit-tools:variables >
+						<munit-tools:variable key="outboundHeaders" value="#[readUrl('classpath://createEmployeeDetailtest\mock_variable_.dwl')]" />
+					</munit-tools:variables>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit:set-event doc:name="Set Input" doc:id="51ebaf6c-c36f-4ced-9f25-7d0254def6f8" >
+				<munit:payload value="#[output application/json --- readUrl('classpath://createEmployeeDetailtest\set-event_payload.dwl')]" encoding="UTF-8" mediaType="application/json" />
+				<munit:attributes value="#[readUrl('classpath://createEmployeeDetailtest\set-event_attributes.dwl')]" />
+				<munit:variables >
+					<munit:variable key="outboundHeaders" value="#[readUrl('classpath://createEmployeeDetailtest\set-event_variable_.dwl')]" />
+				</munit:variables>
+			</munit:set-event>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to create-EmployeeDetail" doc:id="776e1b88-739c-4306-b025-75f33ca42c6e" name="post:\createEmployee:application\json:salesforce-sys-api-config"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert doc:name="Assert payload" doc:id="8b144d4f-7609-4ba0-99b6-0649d41883a0" message="The payload does not match">
+				<munit-tools:that ><![CDATA[#[%dw 2.0
+import createEmployeeDetailtest::assert_expression_payload
+---
+assert_expression_payload::main({payload: payload, attributes: attributes, vars: vars})]]]></munit-tools:that>
+			</munit-tools:assert>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="update-EmployeeDetail-test1" doc:id="cbb74e75-bc3f-4e1e-9b57-a1650dec749b" >
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock Upsert the date into salesforce" doc:id="e4976d0d-bdb7-4aa9-bb51-ba3f34c40229" processor="salesforce:upsert">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="d8f71792-2b5a-4657-8bb8-45c2f554e5e6" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[output application/java --- readUrl('classpath://updateEmployeeDetailtest1\mock_payload.dwl')]" mediaType="application/java" encoding="UTF-8" />
+					<munit-tools:variables >
+						<munit-tools:variable key="outboundHeaders" value="#[readUrl('classpath://updateEmployeeDetailtest1\mock_variable_.dwl')]" />
+						<munit-tools:variable key="employeeId" value="#[output application/java --- readUrl('classpath://updateEmployeeDetailtest1\mock_variable_1.dwl')]" mediaType="application/java" encoding="UTF-8" />
+					</munit-tools:variables>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit:set-event doc:name="Set Input" doc:id="c8cf5a19-3fe2-449f-b138-61294274e61d" >
+				<munit:payload value="#[output application/json --- readUrl('classpath://updateEmployeeDetailtest1\set-event_payload.dwl')]" encoding="UTF-8" mediaType="application/json" />
+				<munit:attributes value="#[readUrl('classpath://updateEmployeeDetailtest1\set-event_attributes.dwl')]" />
+				<munit:variables >
+					<munit:variable key="outboundHeaders" value="#[readUrl('classpath://updateEmployeeDetailtest1\set-event_variable_.dwl')]" />
+				</munit:variables>
+			</munit:set-event>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to update-EmployeeDetail" doc:id="5abfd2d2-1715-42be-80d0-c7f8a81b471d" name="update-EmployeeDetail"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert doc:name="Assert payload" doc:id="d4b82172-3fe9-42f5-88c2-08a382ba84b3" message="The payload does not match">
+				<munit-tools:that ><![CDATA[#[%dw 2.0
+import updateEmployeeDetailtest1::assert_expression_payload
+---
+assert_expression_payload::main({payload: payload, attributes: attributes, vars: vars})]]]></munit-tools:that>
+			</munit-tools:assert>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="delete-EmployeeDetail-test" doc:id="b5753c27-2f6b-4c14-8315-0f110594fd01" >
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock Query the ID  to delete employeeDetais in SF" doc:id="1f43dc40-7a58-4ffb-9088-6710cf3a9ad1" processor="salesforce:query">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="f0582bd0-1ff2-4c61-8d3f-f5da8990ed07" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[output application/java --- readUrl('classpath://deleteEmployeeDetailtest\mock_payload2.dwl')]" mediaType="application/java" encoding="UTF-8" />
+					<munit-tools:variables >
+						<munit-tools:variable key="outboundHeaders" value="#[readUrl('classpath://deleteEmployeeDetailtest\mock_variable_4.dwl')]" />
+						<munit-tools:variable key="employeeId" value="#[output application/java --- readUrl('classpath://deleteEmployeeDetailtest\mock_variable_5.dwl')]" mediaType="application/java" encoding="UTF-8" />
+					</munit-tools:variables>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock Delete  employeeDetais in SF" doc:id="0e327ca3-db19-4fe2-a78e-b3978b3efe40" processor="salesforce:delete">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="fb82ba89-a594-4ebb-9aca-348ad3c63dac" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[output application/java --- readUrl('classpath://deleteEmployeeDetailtest\mock_payload3.dwl')]" mediaType="application/java" encoding="UTF-8" />
+					<munit-tools:variables >
+						<munit-tools:variable key="outboundHeaders" value="#[readUrl('classpath://deleteEmployeeDetailtest\mock_variable_6.dwl')]" />
+						<munit-tools:variable key="employeeId" value="#[output application/java --- readUrl('classpath://deleteEmployeeDetailtest\mock_variable_7.dwl')]" mediaType="application/java" encoding="UTF-8" />
+					</munit-tools:variables>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit:set-event doc:name="Set Input" doc:id="e9c19378-77da-4703-b9d0-b2cff683a19e" >
+				<munit:payload value="#[readUrl('classpath://deleteEmployeeDetailtest\set-event_payload1.dwl')]" encoding="UTF-8" />
+				<munit:attributes value="#[readUrl('classpath://deleteEmployeeDetailtest\set-event_attributes1.dwl')]" />
+				<munit:variables >
+					<munit:variable key="outboundHeaders" value="#[readUrl('classpath://deleteEmployeeDetailtest\set-event_variable_1.dwl')]" />
+				</munit:variables>
+			</munit:set-event>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to delete-EmployeeDetail" doc:id="2385d8e7-55a7-4fdd-ad02-079fb9a53cc3" name="delete-EmployeeDetail"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert doc:name="Assert payload" doc:id="fbe1c6d5-9efd-46fe-92c2-16ac57a09b43" message="The payload does not match">
+				<munit-tools:that ><![CDATA[#[%dw 2.0
+import deleteEmployeeDetailtest::assert_expression_payload1
+---
+assert_expression_payload1::main({payload: payload, attributes: attributes, vars: vars})]]]></munit-tools:that>
+			</munit-tools:assert>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="get-EmployeeDetail-test" doc:id="0670959b-0eb8-4929-8561-c19601fb230f" >
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock Query the daEmployee details from the saleforce" doc:id="b82e4579-9da3-4449-ba31-e9f84e8e53c9" processor="salesforce:query">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="0f4a276c-8cfe-4f98-909b-f60b10dfe96b" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[output application/java --- readUrl('classpath://getEmployeeDetailtest\mock_payload2.dwl')]" mediaType="application/java" encoding="UTF-8" />
+					<munit-tools:variables >
+						<munit-tools:variable key="outboundHeaders" value="#[readUrl('classpath://getEmployeeDetailtest\mock_variable_4.dwl')]" />
+						<munit-tools:variable key="employeeId" value="#[output application/java --- readUrl('classpath://getEmployeeDetailtest\mock_variable_5.dwl')]" mediaType="application/java" encoding="UTF-8" />
+					</munit-tools:variables>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit:set-event doc:name="Set Input" doc:id="258dbcbd-1be4-44d6-b290-ee1f512f3259" >
+				<munit:payload value="#[readUrl('classpath://getEmployeeDetailtest\set-event_payload2.dwl')]" encoding="UTF-8" />
+				<munit:attributes value="#[readUrl('classpath://getEmployeeDetailtest\set-event_attributes2.dwl')]" />
+				<munit:variables >
+					<munit:variable key="outboundHeaders" value="#[readUrl('classpath://getEmployeeDetailtest\set-event_variable_2.dwl')]" />
+				</munit:variables>
+			</munit:set-event>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to get-EmployeeDetail" doc:id="cde9b97d-360c-4cc2-90e5-74e87cf696db" name="get-EmployeeDetail"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert doc:name="Assert payload" doc:id="6e31a494-5968-4416-b019-0e4f892fdbb5" message="The payload does not match">
+				<munit-tools:that ><![CDATA[#[%dw 2.0
+import getEmployeeDetailtest::assert_expression_payload2
+---
+assert_expression_payload2::main({payload: payload, attributes: attributes, vars: vars})]]]></munit-tools:that>
+			</munit-tools:assert>
+		</munit:validation>
+	</munit:test>
+
+
+</mule>

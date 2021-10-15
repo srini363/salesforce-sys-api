@@ -1,0 +1,30 @@
+{
+  "headers": {
+    "client_id": "1",
+    "client_secret": "1",
+    "content-type": "application/json",
+    "user-agent": "PostmanRuntime/7.26.8",
+    "accept": "*/*",
+    "postman-token": "388420c8-6b69-4d23-bda3-5fe2c4281374",
+    "host": "localhost:8081",
+    "accept-encoding": "gzip, deflate, br",
+    "connection": "keep-alive",
+    "content-length": "464"
+  },
+  "clientCertificate": null,
+  "method": "POST",
+  "scheme": "https",
+  "queryParams": {},
+  "requestUri": "/api/v1/updateEmployee",
+  "queryString": "",
+  "version": "HTTP/1.1",
+  "maskedRequestPath": "/updateEmployee",
+  "listenerPath": "/api/v1/*",
+  "relativePath": "/api/v1/updateEmployee",
+  "localAddress": "/127.0.0.1:8081",
+  "uriParams": {},
+  "rawRequestUri": "/api/v1/updateEmployee",
+  "rawRequestPath": "/api/v1/updateEmployee",
+  "remoteAddress": "/127.0.0.1:55042",
+  "requestPath": "/api/v1/updateEmployee"
+}

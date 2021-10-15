@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:munit="http://www.mulesoft.org/schema/mule/munit"
+	xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd 
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd
+http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd">
+	<munit:config name="salesforce-sys-api-test-suite.xml" />
+	<http:request-config name="HTTP_Test_Request_Configuration">
+        <http:request-connection host="0.0.0.0" port="8081">
+			
+		
+
+		</http:request-connection>
+    </http:request-config>
+    <configuration-properties doc:name="Configuration properties" doc:id="bda982cd-1218-4917-9b87-a0fc44af2a19" file="config\common-test-properties.yaml" />
+	<munit:test name="salesforce-sys-api-test-suite-error-handler-flow" doc:id="7234a0f2-00e1-4e36-83a1-d86c2241c1fd" description="Test" expectedErrorType="ANY">
+                    <munit:enable-flow-sources >
+			<munit:enable-flow-source value="salesforce-sys-api-main" />
+			<munit:enable-flow-source value="get:\employee\(employeeId):salesforce-sys-api-config" />
+			<munit:enable-flow-source value="get-EmployeeDetail" />
+		</munit:enable-flow-sources>
+		<munit:execution>
+			<http:request method="GET" doc:name="Request for Salesforce System API" doc:id="73cf9ad4-7d00-4376-9a05-a4c43c269c5a" config-ref="HTTP_Test_Request_Configuration" path="/api/v1/employee/4"/>
+		</munit:execution>
+		<munit:validation>
+            <munit-tools:assert-that expression="#[attributes.statusCode]" is="#[MunitTools::equalTo(400)]" message="The HTTP Status code is not correct!" doc:name="Assert That Status Code is 400" />
+        </munit:validation>
+	</munit:test>
+
+
+</mule>

@@ -1,0 +1,20 @@
+###Configurations which donot change with environments ###
+
+api:
+ name: "salesforce-sys-api"
+ version: "1.0"
+ 
+# Indicate which fields should not be logged
+json:
+  logger:
+    disabled:
+      fields: ""
+    application:
+      name: "salesforce-sys-api" # [DO NOT EDIT] To be replaced by Maven build - ${project.artifactId}
+      version: "1.0" # [DO NOT EDIT] To be replaced by Maven build - ${project.version}
+
+https:
+  port: "8081"
+  host: "0.0.0.0"
+  protocol: "HTTPS"
+

@@ -1,0 +1,11 @@
+###Configurations which donot change with environments ###
+
+  
+munit:
+  https:
+    port: "8081"
+    timeout: "60000"
+    host: "localhost"
+    protocol: "HTTPS"
+    getDetails: "/api/v1/employee/2"
+    

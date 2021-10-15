@@ -1,0 +1,61 @@
+#%RAML 1.0
+title: salesforce-sys-api
+version: v1
+protocols: [HTTPS]
+mediaType: [application/json]
+
+uses:
+  utils: util-library/utils.raml
+
+/updateEmployee: 
+  post: 
+    is: [utils.secured]
+    body:
+      application/json:
+        type: !include data-type/employeeDetails.raml 
+    responses: # declare a response
+      200: # HTTP status code
+        body: # declare content of response
+          application/json: # media type
+            example: | # example of how a response looks
+              {
+                "message": "Employee Record Updated"
+              }
+
+/createEmployee: 
+  post: 
+    is: [utils.secured]
+    body:
+      application/json:
+        example: !include example/employeeDetails.json  
+    responses: # declare a response
+      200: # HTTP status code
+        body: # declare content of response
+          application/json: # media type
+            example: | # example of how a response looks
+              {
+                "message": "Employee Record Created"
+              }
+/employee:
+  /{employeeId}:
+    get:
+      is: [utils.secured]
+      displayName: Title Provider Process API
+      description: Fetch Employee details from SF
+      
+      responses: 
+        200:
+          body: 
+            application/json:
+              example: !include example/employeeDetails.json
+
+    delete:
+      is: [utils.secured]
+      displayName: Title Provider Process API
+      description: Delete Employee details from SF
+      
+      responses: 
+        200:
+          body: 
+            type: string         
+            example: "Employee details is deleted succussfully"
