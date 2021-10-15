@@ -113,7 +113,7 @@
 			"response": []
 		},
 		{
-			"name": "https://localhost:8081/api/v1/updateEmployee",
+			"name": "http://localhost:8081/api/v1/updateEmployee",
 			"request": {
 				"method": "POST",
 				"header": [
